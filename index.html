@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Generator Veo 3</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Arial', sans-serif; }
+    .badge { background-color: #e0e7ff; color: #4338ca; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: bold; display: inline-block; margin: 2px; cursor: pointer; }
+    .dialog-block { background: #f9fafb; padding: 8px 12px; border-left: 4px solid #6366f1; margin-bottom: 6px; border-radius: 6px; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold text-indigo-700 text-center mb-4">Prompt Generator Veo 3</h1>
+    <label class="flex items-center mb-4">
+      <input type="checkbox" id="narrativeMode" class="mr-2"> Aktifkan Gaya Narasi Otomatis
+    </label>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <textarea id="visualDescription" placeholder="Deskripsi Visual..." class="p-3 border rounded"></textarea>
+      <textarea id="characters" placeholder="Karakter (tetap untuk semua part)..." class="p-3 border rounded"></textarea>
+      <textarea id="multiDialogue" placeholder="Dialog Karakter (format: Nama=Dialog)...
+Contoh:
+KAKEK=Jangan kasih kendor!
+CUCU=Iya kek!" class="p-3 border rounded"></textarea>
+      <input id="atmosphere" placeholder="Suasana..." class="p-3 border rounded">
+      <input id="audio" placeholder="Audio/Suara..." class="p-3 border rounded">
+      <select id="language" class="p-3 border rounded">
+        <option value="Betawi">Betawi</option>
+        <option value="Jawa">Jawa</option>
+        <option value="Padang">Padang</option>
+        <option value="Indonesia">Bahasa Indonesia Baku</option>
+      </select>
+      <select id="visualStyle" class="p-3 border rounded">
+        <option value="Realistis">Realistis</option>
+        <option value="Cinematic">Cinematic</option>
+        <option value="Animasi 2D">Animasi 2D</option>
+      </select>
+      <select id="cameraAngle" class="p-3 border rounded">
+        <option value="Default">Default</option>
+        <option value="Wide Shot">Wide Shot</option>
+        <option value="Close-up">Close-up</option>
+      </select>
+      <input id="videoPart" placeholder="Durasi / Part..." class="p-3 border rounded">
+    </div>
+
+    <div class="my-4 flex gap-4">
+      <button onclick="generatePrompt()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Hasilkan Prompt</button>
+      <button onclick="copyPrompt()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Salin Prompt</button>
+    </div>
+
+    <div id="result" class="bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap"></div>
+  </div>
+
+  <script>
+    function generatePrompt() {
+      const isNarrative = document.getElementById('narrativeMode').checked;
+      const visual = document.getElementById('visualDescription').value;
+      const character = document.getElementById('characters').value;
+      const dialogBlock = document.getElementById('multiDialogue').value;
+      const mood = document.getElementById('atmosphere').value;
+      const audio = document.getElementById('audio').value;
+      const lang = document.getElementById('language').value;
+      const style = document.getElementById('visualStyle').value;
+      const camera = document.getElementById('cameraAngle').value;
+      const part = document.getElementById('videoPart').value;
+
+      let output = '';
+
+      if (isNarrative) {
+        if (visual) output += `Di tengah ${visual.toLowerCase()}, `;
+        if (character) output += `${character} tampil sebagai tokoh utama. `;
+      }
+
+      if (dialogBlock) {
+        const lines = dialogBlock.split('\n');
+        lines.forEach(line => {
+          const [name, lineText] = line.split('=');
+          if (name && lineText) {
+            output += `\n<div class='dialog-block'><strong>${name.trim().toUpperCase()}:</strong> "${lineText.trim()}"</div>`;
+          }
+        });
+      }
+
+      if (isNarrative) {
+        if (mood) output += ` Suasana terasa ${mood.toLowerCase()}.`;
+        if (audio) output += ` Terdengar ${audio.toLowerCase()} di latar belakang.`;
+        if (lang) output += ` Dialog menggunakan dialek ${lang}.`;
+        if (style) output += ` Visual bergaya ${style.toLowerCase()}.`;
+        if (camera) output += ` Sudut pandang kamera: ${camera.toLowerCase()}.`;
+        if (part) output += ` Ini adalah ${part}.`;
+      } else {
+        if (visual) output += `\nDeskripsi Visual: ${visual}`;
+        if (character) output += `\nKarakter: ${character}`;
+        if (mood) output += `\nSuasana: ${mood}`;
+        if (audio) output += `\nAudio: ${audio}`;
+        if (lang) output += `\nBahasa: ${lang}`;
+        if (style) output += `\nGaya Visual: ${style}`;
+        if (camera) output += `\nSudut Kamera: ${camera}`;
+        if (part) output += `\nDurasi/Part: ${part}`;
+      }
+
+      document.getElementById('result').innerHTML = output || 'Mohon isi beberapa bidang untuk hasilkan prompt.';
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById('result').textContent;
+      if (!text) return alert('Tidak ada prompt untuk disalin.');
+      navigator.clipboard.writeText(text);
+      alert('Prompt berhasil disalin!');
+    }
+  </script>
+</body>
+</html>
